@@ -96,7 +96,7 @@ class ImageCacheFile(BaseIKFile, ImageFile):
         # Generate the file
         content = generate(self.generator)
 
-        actual_name = self.storage.save(self.name, content)
+        actual_name = self.name = self.storage.save(self.name, content)
 
         # We're going to reuse the generated file, so we need to reset the pointer.
         content.seek(0)
@@ -106,20 +106,6 @@ class ImageCacheFile(BaseIKFile, ImageFile):
         # backend (in ``BaseIKFile._get_file``). Since we already have the
         # contents of the file, what would the point of that be?
         self.file = File(content)
-
-        if actual_name != self.name:
-            get_logger().warning(
-                'The storage backend %s did not save the file with the'
-                ' requested name ("%s") and instead used "%s". This may be'
-                ' because a file already existed with the requested name. If'
-                ' so, you may have meant to call generate() instead of'
-                ' generate(force=True), or there may be a race condition in the'
-                ' file backend %s. The saved file will not be used.' % (
-                    self.storage,
-                    self.name, actual_name,
-                    self.cachefile_backend
-                )
-            )
 
     def __bool__(self):
         if not self.name:
